@@ -1,23 +1,35 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 import calsses from './Modal.css';
-import Auxy from '../../../hoc/Auxy';
+import Auxy from '../../../hoc/Auxy/Auxy';
 import Backdrop from '../Backdrop/Backdrop';
 
-const modal = (props) => {
-    return (
-        <Auxy>
-            <Backdrop show={props.show}
-                      clicked={props.modalClosed}/>
-            <div className={calsses.Modal}
-                 style={{
-                     transform: props.show ? 'translateY(0)' : 'translateY(-100vh)',
-                     opacity: props.show ? '1' : '0'
-                 }}>
-                {props.children}
-            </div>
-        </Auxy>
-    );
-};
+class Modal extends Component {
 
-export default modal;
+    shouldComponentUpdate(nextProps, nextState) {
+       return nextProps.show !==this.props.show;
+    }
+
+    componentWillUpdate () {
+        console.log('[Modal] will update')
+    }
+
+    render() {
+        return (
+            <Auxy>
+                <Backdrop show={this.props.show}
+                          clicked={this.props.modalClosed}/>
+                <div className={calsses.Modal}
+                     style={{
+                         transform: this.props.show ? 'translateY(0)' : 'translateY(-100vh)',
+                         opacity: this.props.show ? '1' : '0'
+                     }}>
+                    {this.props.children}
+                </div>
+            </Auxy>
+        );
+    }
+
+}
+
+export default Modal;
