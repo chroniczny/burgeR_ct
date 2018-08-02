@@ -13,8 +13,7 @@ const INGREDIENT_PRICES = {
     cheese: 0.4,
     meat: 1.3,
     bacon: 0.7,
-
-}
+};
 
 class BurgerBuilder extends Component {
     // constructor(props){
@@ -23,17 +22,23 @@ class BurgerBuilder extends Component {
     // }
 
     state = {
-        ingredients: {
-            salad: 0,
-            bacon: 0,
-            cheese: 0,
-            meat: 0
-        },
+        ingredients: null,
         purchasable: false,
         totalPrice: 4,
         purchasing: false,
-        loading: false
+        loading: false,
+        error: false
     };
+
+    componentDidMount () {
+        axios.get('https://burger-builder-rct.firebaseio.com/ingredients.json')
+            .then(response => {
+                this.setState({ingredients: response.data});
+            })
+            .catch(error => {
+                this.setState({error: true})
+            });
+    }
 
     updatePurchaseState(ingredients) { // when its updated it will be modified
         // const ingredients = { // copy state ingredients to modify them
@@ -95,7 +100,7 @@ class BurgerBuilder extends Component {
 
     purchaseContinueHandler = () => {
         // alert('You continue!');
-        this.setState({ loading: true });
+        this.setState({loading: true});
 
         const order = {
             ingredients: this.state.ingredients,
@@ -113,11 +118,11 @@ class BurgerBuilder extends Component {
         };
 
         axios.post('/orders.json', order) // ".json" for firebase
-            .then( response => {
-                this.setState({ loading: false, purchasing: false });
+            .then(response => {
+                this.setState({loading: false, purchasing: false});
             })
-            .catch( error => {
-                this.setState({ loading: false, purchasing: false });
+            .catch(error => {
+                this.setState({loading: false, purchasing: false});
             });
     };
 
@@ -125,33 +130,45 @@ class BurgerBuilder extends Component {
         const disableInfo = { // copied state.ingredients - separate instance
             ...this.state.ingredients
         };
+
         for (let key in disableInfo) {
             disableInfo[key] = disableInfo[key] <= 0
         }
 
-        let orderSummary = <OrderSummary
-            ingredients={this.state.ingredients}
-            price={this.state.totalPrice.toFixed(2)}
-            purchaseCanceled={this.purchaseCancelHandler}
-            purchaseContinued={this.purchaseContinueHandler}/>;
+        let orderSummary = null;
+        let burger = this.state.error ? <p>Ingredients can't be loded </p> : <Spinner />;
+
+        if (this.state.ingredients) {
+            burger = (
+                <Auxy>
+                    <Burger ingredients={this.state.ingredients}/>
+                    <BuildControls
+                        ingredientAdded={this.addIngredientHandler}
+                        ingredirntRemove={this.removeIngredientHandler}
+                        disabled={disableInfo}
+                        purchasable={this.state.purchasable}
+                        ordered={this.purchaseHandler}
+                        price={this.state.totalPrice}/>
+                </Auxy>);
+
+            orderSummary = <OrderSummary
+                ingredients={this.state.ingredients}
+                price={this.state.totalPrice.toFixed(2)}
+                purchaseCanceled={this.purchaseCancelHandler}
+                purchaseContinued={this.purchaseContinueHandler}/>;
+        }
 
         if (this.state.loading) {
             orderSummary = <Spinner />;
         }
+
         return (
             <Auxy>
                 <Modal show={this.state.purchasing}
                        modalClosed={this.purchaseCancelHandler}>
                     {orderSummary}
                 </Modal>
-                <Burger ingredients={this.state.ingredients}/>
-                <BuildControls
-                    ingredientAdded={this.addIngredientHandler}
-                    ingredirntRemove={this.removeIngredientHandler}
-                    disabled={disableInfo}
-                    purchasable={this.state.purchasable}
-                    ordered={this.purchaseHandler}
-                    price={this.state.totalPrice}/>
+                {burger}
             </Auxy>
         );
     }
