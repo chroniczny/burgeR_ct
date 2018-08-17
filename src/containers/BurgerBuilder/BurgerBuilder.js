@@ -99,31 +99,33 @@ class BurgerBuilder extends Component {
     };
 
     purchaseContinueHandler = () => {
-        // alert('You continue!');
-        this.setState({loading: true});
-
-        const order = {
-            ingredients: this.state.ingredients,
-            price: this.state.totalPrice,
-            customer: {
-                name: 'Jakub K',
-                address: {
-                    street: 'Sessamystreet 16',
-                    zipCode: '00-001',
-                    country: 'Neverland'
-                },
-                email: 'tet@test.com'
-            },
-            deliveryMethod: 'fastest'
-        };
-
-        axios.post('/orders.json', order) // ".json" for firebase
-            .then(response => {
-                this.setState({loading: false, purchasing: false});
-            })
-            .catch(error => {
-                this.setState({loading: false, purchasing: false});
-            });
+    //     // alert('You continue!');
+    //     this.setState({loading: true});
+    //
+    //     const order = {
+    //         ingredients: this.state.ingredients,
+    //         price: this.state.totalPrice,
+    //         customer: {
+    //             name: 'Jakub K',
+    //             address: {
+    //                 street: 'Sessamystreet 16',
+    //                 zipCode: '00-001',
+    //                 country: 'Neverland'
+    //             },
+    //             email: 'tet@test.com'
+    //         },
+    //         deliveryMethod: 'fastest'
+    //     };
+    //
+    //     axios.post('/orders.json', order) // ".json" for firebase
+    //         .then(response => {
+    //             this.setState({loading: false, purchasing: false});
+    //         })
+    //         .catch(error => {
+    //             this.setState({loading: false, purchasing: false});
+    //         });
+// instead connecting and posting state to firebase we want to change route page to "/checkout"
+        this.props.history.push('/checkout');
     };
 
     render() {
