@@ -125,7 +125,17 @@ class BurgerBuilder extends Component {
     //             this.setState({loading: false, purchasing: false});
     //         });
 // instead connecting and posting state to firebase we want to change route page to "/checkout"
-        this.props.history.push('/checkout');
+        // and pass there params!!
+        const queryParams = [];
+        for (let i in this.state.ingredients) {
+            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));
+        }
+        const queryString = queryParams.join('&');
+
+        this.props.history.push({
+            pathname: '/checkout',
+            search: '?' + queryString
+        });
     };
 
     render() {

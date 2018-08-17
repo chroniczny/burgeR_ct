@@ -11,13 +11,25 @@ class Checkout extends Component {
         }
     };
 
+    //this is how we extract params from url!!!
+    componentDidMount() {
+        const query = new URLSearchParams(this.props.location.search);
+        const ingredients = {};
+        for (let param of query.entries()) {
+            //[salad: 1]
+            ingredients[param[0]] = +param[1];
+        }
+        this.setState({ingredients: ingredients});
+
+    }
+
     checkoutCancelledHandler = () => {
         this.props.history.goBack();
-    }
+    };
 
     checkoutContinuedHandler = () => {
         this.props.history.replace('/checkout/contact-data');
-    }
+    };
 
     render() {
         return (
