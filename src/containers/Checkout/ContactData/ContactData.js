@@ -65,23 +65,22 @@ class ContactData extends Component {
 
     orderHandler = (event) => {
         event.preventDefault(); // because its in form we don't want to reload the page so:
-        console.log(this.props.ingredients);
+
         //code from Burger Builder
         this.setState({loading: true});
+
+        const formData = {};
+        //now I'm creating key-value pairs as {Street: 'Kozia'}
+        for (let formElementIdentifier in this.state.orderForm) {
+            formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value
+        }
+        // with that mapping I can use as a rebuilt object with Submitted
 
         const order = {
             ingredients: this.props.ingredients,
             // passed specially by querry parameters and next by props from Checkout
             price: this.props.price,
-            customer: {
-                name: 'Jakub K',
-                address: {
-                    street: 'Sessamystreet 16',
-                    zipCode: '00-001',
-                    country: 'Neverland'
-                },
-                email: 'tet@test.com'
-            },
+            orderData: formData,
             deliveryMethod: 'fastest'
         };
 
@@ -96,6 +95,22 @@ class ContactData extends Component {
 
     };
 
+    inputChangedHandler = (event, inputIdentifier) => {
+        console.log(event.target.value);
+        const updatedOrderForm = { // cloning is not deep so...
+            ...this.state.orderForm
+        };
+        const updatedFormElement = { // we only need to deep clone and tak care of one propwerty from object
+            ...updatedOrderForm[inputIdentifier]
+        };
+        // which is value - of my input to display it
+
+        updatedFormElement.value = event.target.value;
+        updatedOrderForm[inputIdentifier] = updatedFormElement;
+        this.setState({orderForm: updatedOrderForm});
+
+    };
+
     render() {
         let formElementsArray = [];
         for (let key in this.state.orderForm) {
@@ -106,13 +121,14 @@ class ContactData extends Component {
         }
 
         let form = (
-            <form>
+            <form onSubmit={this.orderHandler}>
                 {formElementsArray.map(formElement => (
                     <Input
                         key={formElement.id}
                         inputtype={formElement.config.elementType}
                         elementConfig={formElement.config.elementConfig}
-                        value={formElement.config.value}/>
+                        value={formElement.config.value}
+                        changed={(event) => this.inputChangedHandler(event, formElement.id)}/>
                 ))}
                 <Button btnType="Success" clicked={this.orderHandler} className={classes.ContactButton}>ORDER</Button>
             </form>
